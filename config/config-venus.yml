@@ -139,10 +139,10 @@ dotfiles_dir: "/home/relkochta/.dotfiles"
 # GDM
 autologin_enable: true
 
-# GNOME Extensions to install and enable
+# GNOME Extensions to install from extensions.gnome.org
 # List extension IDs here
-gnome_extensions_installed_enabled:
-  - 906 # Sound Output Device Chooser
+gnome_extensions_installed:
+  - 906 # Sound Input Output Device Chooser
   - 3740 # Compiz alike magic lamp effect
 
 # GNOME Extensions to enable
