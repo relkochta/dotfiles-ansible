@@ -1,0 +1,13 @@
+- name: Ensure configured user's group exists.
+  group:
+    name: "{{ config.username }}"
+
+- name: Ensure configured user exists.
+  user:
+    name: "{{ config.username }}"
+    comment: "{{ config.fullname }}"
+    group: "{{ config.username }}"
+    groups: "{{ config.user_groups }}"
+    shell: "{{ config.user_shell }}"
+    password: "{{ secrets.user_password }}"
+    append: true

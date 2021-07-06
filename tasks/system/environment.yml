@@ -1,0 +1,7 @@
+- name: Ensure environment variables are set in /etc/environment.
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    regexp: '^{{ item.name }}='
+    line: "{{ item.name }}={{ item.value }}"
+  loop: "{{ config.etc_environment }}"

@@ -1,0 +1,24 @@
+- name: Install GNOME extensions from extensions.gnome.org
+  include_role:
+    name: relkochta.gnome_extensions
+  vars:
+    gnome_extension_ids: "{{ config.gnome_extensions_installed }}"
+
+- name: Enable all configured GNOME extensions
+  community.general.dconf:
+    key: "/org/gnome/shell/enabled-extensions"
+    value: "[{% for item in config.gnome_extensions_enabled %}('{{ item }}'),{% endfor %}]"
+    state: present
+
+- name: Ensure all configured dconf settings are set
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ config.dconf_settings }}"
+
+- name: Set the GNOME favorite apps list
+  community.general.dconf:
+    key: "/org/gnome/shell/favorite-apps"
+    value: "[{% for item in config.gnome_favorites %}('{{ item }}'),{% endfor %}]"
+    state: present

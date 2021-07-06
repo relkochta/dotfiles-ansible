@@ -1,0 +1,59 @@
+---
+- name: Configure Fedora 34 with System-Wide and User-Specific Settings
+  hosts: makemake
+  become: yes
+
+  vars:
+    # Use /usr/bin/python
+    - ansible_python_interpreter: auto
+
+  tasks:
+
+# ------ Preparation ------
+
+    - name: Include Configuration Files
+      include_vars:
+        file: "{{ item }}"
+        name: config
+      with_first_found:
+        - "config/config-{{ ansible_nodename }}.yml"
+        - "config/config-default.yml"
+      tags:
+        - system
+        - user
+
+    - name: Include Secret Variables
+      include_vars:
+        file: secrets/secrets.yml
+        name: secrets
+      tags:
+        - system
+        - user
+
+# ------ System-Wide Configuration ------
+
+    - import_tasks: tasks/system/environment.yml
+      tags: system
+
+    - import_tasks: tasks/system/packages.yml
+      tags: system
+
+    - import_tasks: tasks/system/create_user.yml
+      tags: system
+
+    - import_tasks: tasks/system/gnome.yml
+      tags: system
+
+# ------ User-Specific Configuration ------
+
+    - import_tasks: tasks/user/theme.yml
+      become_user: "{{ config.username }}"
+      tags: user
+
+    - import_tasks: tasks/user/gnome.yml
+      become_user: "{{ config.username }}"
+      tags: user
+
+    - import_tasks: tasks/user/dotfiles.yml
+      become_user: "{{ config.username }}"
+      tags: user

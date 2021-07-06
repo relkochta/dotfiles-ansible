@@ -1,0 +1,8 @@
+---
+roles:
+  - src: "https://github.com/relkochta/ansible-gnome-extensions"
+    version: master
+    name: relkochta.gnome_extensions
+
+collections:
+  - name: community.general

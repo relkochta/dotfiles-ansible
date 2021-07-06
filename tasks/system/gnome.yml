@@ -1,0 +1,25 @@
+- name: Ensure autologin is enabled.
+  community.general.ini_file:
+    path: /etc/gdm/custom.conf
+    section: daemon
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ autologin_config | dict2items }}"
+  vars:
+    autologin_config:
+      AutomaticLoginEnable: "True"
+      AutomaticLogin: "{{ config.username }}"
+  when: config.autologin_enable
+
+- name: Start gdm.service and ensure it is not masked
+  systemd:
+    name: gdm.service
+    enabled: yes
+    state: started
+    masked: no
+
+- name: Set default systemd target to graphical.target
+  file:
+    src: /usr/lib/systemd/system/graphical.target
+    dest: /etc/systemd/system/default.target
+    state: link

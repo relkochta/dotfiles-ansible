@@ -1,0 +1,30 @@
+- name: Update the WhiteSur-Gtk-Theme repository
+  git:
+    repo: "https://github.com/vinceliuice/WhiteSur-gtk-theme.git"
+    dest: "{{ config.source_dir }}/WhiteSur-gtk-theme"
+    depth: 1
+    update: true
+
+- name: Ensure the WhiteSur GTK Theme is installed
+  shell:
+    cmd: "{{ config.source_dir }}/WhiteSur-gtk-theme/install.sh -c dark -i fedora -N glassy --normalshowapps -b blank"
+    chdir: "{{ config.source_dir }}/WhiteSur-gtk-theme"
+
+- name: Ensure the WhiteSur GTK Theme has flatpak support
+  shell:
+    cmd: "{{ config.source_dir }}/WhiteSur-gtk-theme/tweaks.sh -c dark -F -i fedora --silent-mode"
+    chdir: "{{ config.source_dir }}/WhiteSur-gtk-theme"
+  become_user: root
+
+- name: Update the la-capitaine-icon-theme repository
+  git:
+    repo: "https://github.com/keeferrourke/la-capitaine-icon-theme.git"
+    dest: "~/.icons/la-capitaine-icon-theme"
+    depth: 1
+    update: true
+    force: yes
+
+- name: Ensure the La Capitaine icon theme is configured appropriately
+  shell:
+    cmd: "yes | ./configure"
+    chdir: "~/.icons/la-capitaine-icon-theme"

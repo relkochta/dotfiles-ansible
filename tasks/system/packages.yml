@@ -1,0 +1,48 @@
+- name: Ensure all yum_repository repositories are present
+  yum_repository:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    baseurl: "{{ item.baseurl }}"
+    gpgkey: "{{ item.gpgkey }}"
+  loop: "{{ config.yum_repositories }}"
+
+- name: Ensure all dnf repositories are present
+  dnf:
+    name: "{{ config.dnf_repositories }}"
+    state: latest
+    # I really hate having to do this :/
+    disable_gpg_check: true
+
+- name: Ensure all COPR repositories are present
+  community.general.copr:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ config.copr_repositories }}"
+
+- name: Ensure all Flatpak remotes are present
+  community.general.flatpak_remote:
+    name: "{{ item.name }}"
+    flatpakrepo_url: "{{ item.flatpakrepo_url }}"
+  loop: "{{ config.flatpak_remotes }}"
+
+- name: Upgrade all packages
+  dnf:
+    name: "*"
+    state: latest
+
+- name: Install configured packages using dnf
+  dnf:
+    name: "{{ config.dnf_packages_installed }}"
+    state: latest
+
+- name: Remove configured packages using dnf
+  dnf:
+    name: "{{ config.dnf_packages_removed }}"
+    state: absent
+
+- name: Install configured packages using flatpak
+  community.general.flatpak:
+    name: "{{ item.name }}"
+    remote: "{{ item.remote }}"
+    state: present
+  loop: "{{ config.flatpak_packages_installed }}"

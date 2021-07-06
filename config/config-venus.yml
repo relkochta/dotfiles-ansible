@@ -1,0 +1,229 @@
+---
+# System configuration for my laptop (ThinkPad X1 Carbon 9).
+
+# ------ System-Wide Configuration Variables ------
+
+# Repositories to be added by yum_repository
+yum_repositories:
+  - name: brave-browser-rpm-release
+    description: Brave Browser Stable
+    baseurl: "https://brave-browser-rpm-release.s3.brave.com/x86_64/"
+    gpgkey: "https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
+  - name: vscodium
+    description: VSCodium
+    baseurl: "https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/"
+    gpgkey: "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg"
+
+# Repositories to be added by dnf directly (as an rpm)
+dnf_repositories:
+  - "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ansible_distribution_major_version}}.noarch.rpm"
+  - "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ansible_distribution_major_version}}.noarch.rpm"
+
+# COPR Repositories to be enabled
+copr_repositories:
+  - luminoso/Signal-Desktop
+  - luminoso/vorta
+
+# Flatpak Remotes to be added
+flatpak_remotes:
+  - name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+# All packages to be installed by dnf
+dnf_packages_installed:
+  # Base Groups
+  - "@Fedora Workstation"
+
+  # - Libraries/Dependencies -
+  - openssl
+  - cronie
+  - dbus-x11
+  - flatpak
+  - intel-media-driver
+  # Fonts
+  - google-roboto-fonts
+  - google-roboto-mono-fonts
+  # WhiteSur Deps
+  - sassc
+  - glib2-devel
+  - libxml2
+  - libxml2-devel
+  - optipng
+  - inkscape
+
+  # - Python Libraries -
+  - python3-psutil
+
+  # - Command Line Tools -
+  - htop
+  - tmux
+  - vim
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - stow
+
+  # - Development Tools -
+  - make
+
+  # - Graphical Applications -
+  - stellarium
+  - brave-browser
+  - chromium
+  - firefox
+  - xournalpp
+  - virt-manager
+  - remmina
+  - gnome-tweaks
+  - codium
+  - anki
+  - signal-desktop
+  - gnome-extensions-app
+  - vorta
+  - polari
+
+  # - GNOME Shell Extensions -
+  # (some will be installed from git)
+  - gnome-shell-extension-appindicator
+  - gnome-shell-extension-argos
+  - gnome-shell-extension-caffeine
+  - gnome-shell-extension-dash-to-dock
+  - gnome-shell-extension-freon
+  - gnome-shell-extension-gsconnect
+  - gnome-shell-extension-user-theme
+  - gnome-shell-extension-workspace-indicator
+
+# Packages that should be removed by dnf
+dnf_packages_removed:
+  # Icon theme, we will install this from git
+  - la-capitaine-icon-theme
+
+# Packages that should be installed by flatpak
+flatpak_packages_installed:
+  - name: com.moonlight_stream.Moonlight
+    remote: flathub
+  - name: net.bartkessels.getit
+    remote: flathub
+  - name: org.gnome.Podcasts
+    remote: flathub
+
+# System environment variables
+# Will be placed in /etc/environment
+etc_environment:
+  - name: XCURSOR_SIZE
+    value: 24
+  - name: LIBVA_DRIVER_NAME
+    value: iHD
+
+# ------ User-Specific Configuration Variables ------
+
+# User to be created
+username: relkochta
+fullname: "Ryan El Kochta"
+user_shell: "/usr/bin/zsh"
+user_groups:
+  - wheel
+  - input
+  - kvm
+  - qemu
+  - libvirt
+
+# Path to source code (themes, etc)
+# DO NOT use '~' character here
+source_dir: "/home/relkochta/.source"
+
+# Dotfiles
+dotfiles_repo: "https://github.com/relkochta/dotfiles.git"
+dotfiles_dir: "/home/relkochta/.dotfiles"
+
+# GDM
+autologin_enable: true
+
+# GNOME Extensions to install and enable
+# List extension IDs here
+gnome_extensions_installed_enabled:
+  - 906 # Sound Output Device Chooser
+  - 3740 # Compiz alike magic lamp effect
+
+# GNOME Extensions to enable
+# Note: adding an extension here does not automatically install it!
+# This is meant for extensions installed using the system package manager.
+gnome_extensions_enabled:
+  - user-theme@gnome-shell-extensions.gcampax.github.com
+  - workspace-indicator@gnome-shell-extensions.gcampax.github.com
+  - gsconnect@andyholmes.github.io
+  - dash-to-dock@micxgx.gmail.com
+  - appindicatorsupport@rgcjonas.gmail.com
+  - argos@pew.worldwidemann.com
+  - freon@UshakovVasilii_Github.yahoo.com
+  - caffeine@patapon.info
+
+# Favorite apps in GNOME dash (in order)
+gnome_favorites:
+  - brave-browser.desktop
+  - chromium-browser.desktop
+  - org.gnome.Nautilus.desktop
+  - org.gnome.Terminal.desktop
+  - signal-desktop.desktop
+  - org.gnome.Calendar.desktop
+  - firefox.desktop
+  - com.github.xournalpp.xournalpp.desktop
+  - virt-manager.desktop
+  - org.remmina.Remmina.desktop
+  - gnome-system-monitor.desktop
+  - gnome-control-center.desktop
+  - org.gnome.tweaks.desktop
+  - org.gnome.Extensions.desktop
+  - org.gnome.Software.desktop
+  - libreoffice-writer.desktop
+  - libreoffice-calc.desktop
+  - libreoffice-impress.desktop
+  - org.gnome.Calculator.desktop
+  - anki.desktop
+  - codium.desktop
+  - org.gnome.gedit.desktop
+  - org.stellarium.Stellarium.desktop
+
+dconf_settings:
+  - key: "/org/gnome/shell/extensions/user-theme/name"
+    value: "'WhiteSur-dark'"
+  - key: "/org/gnome/desktop/interface/gtk-theme"
+    value: "'WhiteSur-dark'"
+  - key: "/org/gnome/desktop/interface/icon-theme"
+    value: "'la-capitaine-icon-theme'"
+  - key: "/org/gnome/nautilus/preferences/default-folder-viewer"
+    value: "'list-view'"
+  - key: "/org/gtk/settings/file-chooser/sort-directories-first"
+    value: "true"
+  - key: "/org/gnome/desktop/wm/preferences/resize-with-right-button"
+    value: "true"
+  - key: "/org/gnome/desktop/wm/preferences/button-layout"
+    value: "'appmenu:minimize,maximize,close'"
+  - key: "/org/gnome/desktop/interface/clock-format"
+    value: "'12h'"
+  - key: "/org/gnome/desktop/interface/clock-show-weekday"
+    value: "true"
+  - key: "/org/gnome/desktop/peripherals/touchpad/tap-to-click"
+    value: "true"
+  - key: "/org/gnome/desktop/interface/document-font-name"
+    value: "'Roboto 11'"
+  - key: "/org/gnome/desktop/interface/font-name"
+    value: "'Roboto 11'"
+  - key: "/org/gnome/desktop/interface/monospace-font-name"
+    value: "'Roboto Mono 11'"
+  - key: "/org/gnome/desktop/wm/preferences/titlebar-font"
+    value: "'Roboto Bold 11'"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/dash-max-icon-size"
+    value: "45"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/custom-theme-shrink"
+    value: "true"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/isolate-workspaces"
+    value: "true"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/show-trash"
+    value: "false"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/click-action"
+    value: "'minimize-or-previews'"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/hide-delay"
+    value: "0.1"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/animation-duration"
+    value: "0.1"

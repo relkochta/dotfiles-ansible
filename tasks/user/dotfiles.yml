@@ -1,0 +1,33 @@
+- name: Ensure dotfiles are up to date.
+  git:
+    repo: "{{ config.dotfiles_repo }}"
+    dest: "{{ config.dotfiles_dir }}"
+    update: true
+
+- name: Find all GNU Stow directories.
+  find:
+    name: "{{ config.dotfiles_dir }}/"
+    recurse: false
+    file_type: directory
+  register: stow_dirs
+
+- name: Stow all found dotfile packages.
+  shell:
+    cmd: "stow -d {{ config.dotfiles_dir }} -t ~/ $(basename {{ item.path }})"
+    chdir: "{{ config.dotfiles_dir }}"
+  loop: "{{ stow_dirs.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Ensure oh-my-zsh is cloned
+  git:
+    repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+    dest: "~/.oh-my-zsh"
+    update: true
+    depth: 1
+
+- name: Ensure Powerlevel10k is cloned
+  git:
+    repo: "https://github.com/romkatv/powerlevel10k.git"
+    dest: "~/.oh-my-zsh/custom/themes/powerlevel10k"
+    update: true
