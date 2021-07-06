@@ -4,7 +4,7 @@
   become: yes
 
   vars:
-    # Use /usr/bin/python
+    # Use /usr/bin/python3
     - ansible_python_interpreter: auto
 
   tasks:
