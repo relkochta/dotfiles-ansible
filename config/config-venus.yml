@@ -157,6 +157,8 @@ gnome_extensions_enabled:
   - argos@pew.worldwidemann.com
   - freon@UshakovVasilii_Github.yahoo.com
   - caffeine@patapon.info
+  - sound-output-device-chooser@kgshank.net
+  - compiz-alike-magic-lamp-effect@hermes83.github.com
 
 # Favorite apps in GNOME dash (in order)
 gnome_favorites:
@@ -227,3 +229,5 @@ dconf_settings:
     value: "0.1"
   - key: "/org/gnome/shell/extensions/dash-to-dock/animation-duration"
     value: "0.1"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/icon-size-fixed"
+    value: "true"

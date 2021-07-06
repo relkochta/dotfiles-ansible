@@ -227,3 +227,5 @@ dconf_settings:
     value: "0.1"
   - key: "/org/gnome/shell/extensions/dash-to-dock/animation-duration"
     value: "0.1"
+  - key: "/org/gnome/shell/extensions/dash-to-dock/icon-size-fixed"
+    value: "true"
