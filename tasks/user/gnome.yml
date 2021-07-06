@@ -10,6 +10,11 @@
     value: "[{% for item in config.gnome_extensions_enabled %}('{{ item }}'),{% endfor %}]"
     state: present
 
+- name: Delete Argos example script
+  file:
+    path: "~/.config/argos/argos.sh"
+    state: absent
+
 - name: Ensure all configured dconf settings are set
   community.general.dconf:
     key: "{{ item.key }}"
