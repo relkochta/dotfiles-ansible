@@ -249,4 +249,4 @@ dconf_settings:
     value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
     # So that I can actually see lol
   - key: "/org/gnome/desktop/interface/text-scaling-factor"
-    value: "1.25"
+    value: "1.15"
