@@ -1,0 +1,4 @@
+- name: Install user-level Pip modules.
+  pip:
+    name: "{{ config.pip_installed_user }}"
+    state: present

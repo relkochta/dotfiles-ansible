@@ -46,6 +46,10 @@
 
 # ------ User-Specific Configuration ------
 
+    - import_tasks: tasks/user/pip.yml
+      become_user: "{{ config.username }}"
+      tags: user
+
     - import_tasks: tasks/user/theme.yml
       become_user: "{{ config.username }}"
       tags: user

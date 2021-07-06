@@ -140,6 +140,11 @@ secrets_dir: "/home/relkochta/.secrets"
 # GDM
 autologin_enable: true
 
+# Pip modules to be installed at the user level:
+pip_installed_user:
+  - geocoder
+  - python-coinmarketcap
+
 # GNOME Extensions to install from extensions.gnome.org
 # List extension IDs here
 gnome_extensions_installed:
