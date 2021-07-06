@@ -7,7 +7,7 @@
 
 - name: Ensure the WhiteSur GTK Theme is installed
   shell:
-    cmd: "{{ config.source_dir }}/WhiteSur-gtk-theme/install.sh -c dark -i fedora -N glassy --normalshowapps -b blank"
+    cmd: "{{ config.source_dir }}/WhiteSur-gtk-theme/install.sh -c dark -i fedora -N glassy --normalshowapps -b blank -p 60"
     chdir: "{{ config.source_dir }}/WhiteSur-gtk-theme"
 
 - name: Ensure the WhiteSur GTK Theme has flatpak support
