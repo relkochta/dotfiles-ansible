@@ -31,3 +31,21 @@
     repo: "https://github.com/romkatv/powerlevel10k.git"
     dest: "~/.oh-my-zsh/custom/themes/powerlevel10k"
     update: true
+
+- name: Find all available wallpapers
+  find:
+    name: "~/.config/wallpapers/"
+    recurse: true
+    file_type: file
+    patterns: '*.png,*.jpg,*.jpeg'
+  register: wallpapers
+
+- name: Set a random wallpaper
+  community.general.dconf:
+    key: "/org/gnome/desktop/background/picture-uri"
+    value: "'{{ item.path }}'"
+    state: present
+  with_random_choice: "{{ wallpapers.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  changed_when: False
