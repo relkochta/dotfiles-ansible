@@ -14,6 +14,13 @@
     dest: "{{ config.secrets_dir }}/secrets.json"
     content: "{{ secrets.secrets_file_contents | to_json }}"
 
+- name: Ensure all other configured git repositories are up to date.
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    update: true
+  loop: "{{ config.user_git_repositories }}"
+
 - name: Find all GNU Stow directories.
   find:
     name: "{{ config.dotfiles_dir }}/"
@@ -28,19 +35,6 @@
   loop: "{{ stow_dirs.files }}"
   loop_control:
     label: "{{ item.path }}"
-
-- name: Ensure oh-my-zsh is cloned
-  git:
-    repo: "https://github.com/ohmyzsh/ohmyzsh.git"
-    dest: "~/.oh-my-zsh"
-    update: true
-    depth: 1
-
-- name: Ensure Powerlevel10k is cloned
-  git:
-    repo: "https://github.com/romkatv/powerlevel10k.git"
-    dest: "~/.oh-my-zsh/custom/themes/powerlevel10k"
-    update: true
 
 - name: Find all available wallpapers
   find:

@@ -58,8 +58,6 @@ dnf_packages_installed:
   - tmux
   - vim
   - zsh
-  - zsh-autosuggestions
-  - zsh-syntax-highlighting
   - stow
 
   # - Development Tools -
@@ -125,7 +123,6 @@ user_groups:
   - qemu
   - libvirt
 
-
 # Path to source code (themes, etc)
 # DO NOT use '~' character here
 source_dir: "/home/relkochta/.source"
@@ -134,6 +131,18 @@ source_dir: "/home/relkochta/.source"
 dotfiles_repo: "https://github.com/relkochta/dotfiles.git"
 dotfiles_dir: "/home/relkochta/.dotfiles"
 secrets_dir: "/home/relkochta/.secrets"
+
+# Git repositories to clone (in addition to dotfiles).
+# Useful for zsh plugins, etc
+user_git_repositories:
+  - repo: "https://github.com/ohmyzsh/ohmyzsh.git"
+    dest: "~/.oh-my-zsh"
+  - repo: "https://github.com/romkatv/powerlevel10k.git"
+    dest: "~/.oh-my-zsh/custom/themes/powerlevel10k"
+  - repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  - repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    dest: "~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
 
 # GDM
 autologin_enable: true
@@ -275,3 +284,6 @@ dconf_settings:
     value: "['b1dcc9dd-5262-4d8d-a863-c897e6d979b9']"
   - key: "/org/gnome/terminal/legacy/profiles:/default"
     value: "'b1dcc9dd-5262-4d8d-a863-c897e6d979b9'"
+  # Gedit
+  - key: "/org/gnome/gedit/preferences/editor/highlight-current-line"
+    value: "false"
