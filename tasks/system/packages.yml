@@ -19,6 +19,11 @@
     state: enabled
   loop: "{{ config.copr_repositories }}"
 
+- name: Ensure Flatpak is present
+  dnf:
+    name: flatpak
+    state: latest
+
 - name: Ensure all Flatpak remotes are present
   community.general.flatpak_remote:
     name: "{{ item.name }}"

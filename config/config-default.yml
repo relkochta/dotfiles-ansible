@@ -38,7 +38,6 @@ dnf_packages_installed:
   - openssl
   - cronie
   - dbus-x11
-  - flatpak
   # Fonts
   - google-roboto-fonts
   - google-roboto-mono-fonts
