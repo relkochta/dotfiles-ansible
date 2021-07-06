@@ -4,6 +4,16 @@
     dest: "{{ config.dotfiles_dir }}"
     update: true
 
+- name: Ensure secrets directory exists.
+  file:
+    dest: "{{ config.secrets_dir }}"
+    state: directory
+
+- name: Ensure secrets file is placed in the correct location.
+  copy:
+    dest: "{{ config.secrets_dir }}/secrets.json"
+    content: "{{ secrets.secrets_file_contents | to_json }}"
+
 - name: Find all GNU Stow directories.
   find:
     name: "{{ config.dotfiles_dir }}/"
