@@ -1,0 +1,6 @@
+- name: Configure system-wide lineinfile options.
+  lineinfile:
+    dest: "{{ item.dest }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop: "{{ config.line_in_files_system }}"
