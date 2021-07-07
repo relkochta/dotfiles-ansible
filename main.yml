@@ -38,6 +38,9 @@
     - import_tasks: tasks/system/packages.yml
       tags: system
 
+    - import_tasks: tasks/system/systemd.yml
+      tags: system
+
     - import_tasks: tasks/system/create_user.yml
       tags: system
 

@@ -1,0 +1,7 @@
+- name: Ensure systemd services are configured appropriately.
+  systemd:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    enabled: "{{ item.enabled }}"
+    masked: "{{ item.masked }}"
+  loop: "{{ config.systemd_services }}"
