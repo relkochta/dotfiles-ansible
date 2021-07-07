@@ -64,7 +64,7 @@ The playbook can be run either on bare metal or by creating a new Vagrant virtua
 As an example, on Fedora, all four can be installed using:
 
 ```bash
-sudo dnf install libvirt vagrant vagrant-libvirt
+sudo dnf install libvirt vagrant vagrant-libvirt ansible
 ```
 
 Next, you will need to ensure your user is a member of the `libvirt` group, so that Vagrant can create the appropriate network interfaces:
@@ -90,6 +90,12 @@ vagrant up
 
 The virtual machine will be created using the libvirt backend, and the graphical interface can be accessed with a tool such as [virt-manager](https://virt-manager.org/).
 
+To rerun the playbook after the virtual machine has been created:
+
+```bash
+vagrant provision
+```
+
 To remove the virtual machine, use:
 
 ```bash
@@ -103,6 +109,26 @@ vagrant ssh
 ```
 
 More information regarding Vagrant can be found in the [Vagrant Documentation](https://www.vagrantup.com/docs).
+
+Usability Tip:
+
+Vagrant defaults to a VNC output and a Cirrus virtual graphics card. While this is fine for debugging purposes, it is incredibly slow and Vagrant currently has no way to configure virtio-accelerated graphics.
+
+To do so manually, wait until Vagrant has created and provisioned the virtual machine, then turn it off in `virt-manager`. Under `Display VNC`, set: 
+
+`Type: Spice Server`, 
+
+`Listen Type: None`, and
+
+`OpenGL: Checked`
+
+Under `Video Cirrus`, set:
+
+`Model: Virtio`, and
+
+`3D Acceleration: Checked`
+
+Now start the VM again. There may be some artifacting but the performance will be better.
 
 ### Installation on Bare Metal
 
