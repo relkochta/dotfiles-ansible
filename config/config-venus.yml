@@ -59,6 +59,8 @@ dnf_packages_installed:
   - vim
   - zsh
   - stow
+  - tlp
+  - tlp-rdw
 
   # - Development Tools -
   - make
@@ -111,6 +113,16 @@ etc_environment:
     value: 24
   - name: LIBVA_DRIVER_NAME
     value: iHD
+
+systemd_services:
+  - name: tlp.service
+    state: started
+    enabled: true
+    masked: false
+  - name: tlp-rdw.service
+    state: started
+    enabled: true
+    masked: false
 
 # ------ User-Specific Configuration Variables ------
 
