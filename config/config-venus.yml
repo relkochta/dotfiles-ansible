@@ -119,10 +119,6 @@ systemd_services:
     state: started
     enabled: true
     masked: false
-  - name: tlp-rdw.service
-    state: started
-    enabled: true
-    masked: false
 
 # ------ User-Specific Configuration Variables ------
 
