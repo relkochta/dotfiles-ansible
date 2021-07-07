@@ -132,7 +132,34 @@ Now start the VM again. There may be some artifacting but the performance will b
 
 ### Installation on Bare Metal
 
-TODO
+This playbook should work on any Fedora installation, though it has only been tested on Fedora 34.
+
+First, you will need to remove any dotfiles in your home directory that conflict with the repository configured as `dotfiles_repo` in your configuration file. When the playbook attempts to install these, if it sees a conflict, it will not overwrite local files, but will instead raise an error. This is by design.
+
+Install Ansible:
+
+```bash
+sudo dnf install ansible
+```
+
+Install the playbook's requirements:
+
+```bash
+ansible-galaxy collection install -r requirements.yml
+ansible-galaxy install -r requriements.yml
+```
+
+Run the playbook locally:
+
+```bash
+ansible-playbook -i inventory -K main.yml
+```
+
+Or, if you used Ansible Vault to encrypt your secrets file:
+
+```bash
+ansible-playbook -i inventory -K --ask-vault-pass main.yml
+```
 
 ## License
 
