@@ -51,6 +51,13 @@ dnf_packages_installed:
   - optipng
   - inkscape
 
+  # - Ncspot Dependencies -
+  - dbus-devel
+  - libxcb-devel
+  - ncurses-devel
+  - openssl-devel
+  - pulseaudio-libs-devel
+
   # - Python Libraries -
   - python3-psutil
 
