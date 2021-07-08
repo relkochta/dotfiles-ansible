@@ -38,6 +38,7 @@ dnf_packages_installed:
   - openssl
   - cronie
   - dbus-x11
+  - python3-dnf-plugin-versionlock
   - intel-media-driver
   # Fonts
   - google-roboto-fonts

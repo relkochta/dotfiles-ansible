@@ -39,6 +39,7 @@
   dnf:
     name: "{{ config.dnf_packages_installed }}"
     state: latest
+    allow_downgrade: true
 
 - name: Remove configured packages using dnf
   dnf:
