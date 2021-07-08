@@ -1,0 +1,16 @@
+module fedora-evdev 1.0;
+
+require {
+	type svirt_t;
+	type systemd_machined_t;
+	type systemd_unit_file_t;
+	type event_device_t;
+	class chr_file { open read write ioctl };
+	class service stop;
+}
+
+#============= svirt_t ==============
+allow svirt_t event_device_t:chr_file { open read write ioctl };
+
+#============= systemd_machined_t ==============
+allow systemd_machined_t systemd_unit_file_t:service stop;
