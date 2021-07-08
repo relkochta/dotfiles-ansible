@@ -156,7 +156,7 @@ user_groups:
 source_dir: "/home/relkochta/.source"
 
 # Dotfiles
-dotfiles_repo: "https://github.com/relkochta/dotfiles.git"
+dotfiles_repo: "git@github.com:relkochta/dotfiles.git"
 dotfiles_dir: "/home/relkochta/.dotfiles"
 secrets_dir: "/home/relkochta/.secrets"
 
