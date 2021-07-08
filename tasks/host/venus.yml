@@ -1,3 +1,16 @@
 ---
 # Tasks specific to my laptop (X1 Carbon 9)
 
+# ------ Copy Secrets ------
+
+- name: Copy Secret Files/Folders
+  copy:
+    src: "{{ secret.src }}"
+    dest: "{{ secret.dest }}"
+    mode: "{{ secret.mode }}"
+    owner: "{{ secret.owner }}"
+    group: "{{ secret.group }}"
+  loop: "{{ secrets.secret_files_venus }}"
+  loop_control:
+    loop_var: secret
+  tags: host

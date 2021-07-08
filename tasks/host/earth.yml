@@ -8,13 +8,12 @@
     src: "{{ secret.src }}"
     dest: "{{ secret.dest }}"
     mode: "{{ secret.mode }}"
-    owner: root
-    group: root
-  loop: "{{ secrets.secret_files }}"
+    owner: "{{ secret.owner }}"
+    group: "{{ secret.group }}"
+  loop: "{{ secrets.secret_files_earth }}"
   loop_control:
     loop_var: secret
   tags: host
-
 
 # ------ Set Up Disks ------
 
@@ -25,7 +24,7 @@
     opts: "{{ entry.opts }}"
     password: "{{ entry.password }}"
     backing_device: "{{ entry.backing_device }}"
-  loop: "{{ secrets.crypttab_entries }}"
+  loop: "{{ secrets.crypttab_entries_earth }}"
   loop_control:
     loop_var: entry
   tags: host
@@ -34,7 +33,7 @@
   file:
     dest: "{{ mount.path }}"
     state: directory
-  loop: "{{ secrets.fstab_entries }}"
+  loop: "{{ secrets.fstab_entries_earth }}"
   loop_control:
     loop_var: mount
   tags: host
@@ -46,7 +45,7 @@
     fstype: "{{ mount.fstype }}"
     opts: "{{ mount.opts }}"
     state: "{{ mount.state }}"
-  loop: "{{ secrets.fstab_entries }}"
+  loop: "{{ secrets.fstab_entries_earth }}"
   loop_control:
     loop_var: mount
   tags: host
