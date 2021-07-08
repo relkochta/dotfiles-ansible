@@ -50,7 +50,10 @@
       tags: system
 
     - import_tasks: tasks/system/gnome.yml
-      tags: system    
+      tags: system
+
+    - import_tasks: tasks/system/symlinks.yml
+      tags: system
 
 # ------ User-Specific Configuration ------
 

@@ -138,6 +138,11 @@ line_in_files_system:
     regexp: "^STOP_CHARGE_THRESH_BAT0="
     line: "STOP_CHARGE_THRESH_BAT0=75"
 
+# System Symlinks (useful to alias things globally)
+system_symlinks:
+  - src: "/usr/bin/codium"
+    dest: "/usr/bin/code"
+
 # ------ User-Specific Configuration Variables ------
 
 # User to be created

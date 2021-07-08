@@ -1,0 +1,6 @@
+- name: Create system symlinks
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  loop: "{{ config.system_symlinks }}"
