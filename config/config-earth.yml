@@ -149,11 +149,6 @@ systemd_services:
 # Configuration options to be set globally
 line_in_files_system: []
 
-# System Symlinks (useful to alias things globally)
-system_symlinks:
-  - src: "/usr/bin/codium"
-    dest: "/usr/bin/code"
-
 # ------ User-Specific Configuration Variables ------
 
 # User to be created
