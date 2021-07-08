@@ -21,6 +21,7 @@
       tags:
         - system
         - user
+        - host
 
     - name: Include Secret Variables
       include_vars:
@@ -29,6 +30,7 @@
       tags:
         - system
         - user
+        - host
 
 # ------ System-Wide Configuration ------
 
@@ -48,7 +50,7 @@
       tags: system
 
     - import_tasks: tasks/system/gnome.yml
-      tags: system
+      tags: system    
 
 # ------ User-Specific Configuration ------
 
@@ -67,3 +69,12 @@
     - import_tasks: tasks/user/dotfiles.yml
       become_user: "{{ config.username }}"
       tags: user
+
+# ------ Host-Specific Configuration ------
+
+    - include_tasks: "{{ item }}"
+      with_first_found:
+        - files:
+            - "tasks/host/{{ ansible_nodename }}.yml"
+          skip: true
+      tags: host

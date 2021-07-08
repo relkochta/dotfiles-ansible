@@ -1,0 +1,407 @@
+---
+# Tasks specific to my desktop (R7 2700X + RX 550 + VFIO).
+
+# ------ Copy Secrets ------
+
+- name: Copy Secret Files/Folders
+  copy:
+    src: "{{ secret.src }}"
+    dest: "{{ secret.dest }}"
+    mode: "{{ secret.mode }}"
+    owner: root
+    group: root
+  loop: "{{ secrets.secret_files }}"
+  loop_control:
+    loop_var: secret
+  tags: host
+
+
+# ------ Set Up Disks ------
+
+- name: Set up /etc/crypttab
+  community.general.crypttab:
+    name: "{{ entry.name }}"
+    state: "{{ entry.state }}"
+    opts: "{{ entry.opts }}"
+    password: "{{ entry.password }}"
+    backing_device: "{{ entry.backing_device }}"
+  loop: "{{ secrets.crypttab_entries }}"
+  loop_control:
+    loop_var: entry
+  tags: host
+
+- name: Create mount directories
+  file:
+    dest: "{{ mount.path }}"
+    state: directory
+  loop: "{{ secrets.fstab_entries }}"
+  loop_control:
+    loop_var: mount
+  tags: host
+
+- name: Set up /etc/fstab
+  ansible.posix.mount:
+    path: "{{ mount.path }}"
+    src: "{{ mount.src }}"
+    fstype: "{{ mount.fstype }}"
+    opts: "{{ mount.opts }}"
+    state: "{{ mount.state }}"
+  loop: "{{ secrets.fstab_entries }}"
+  loop_control:
+    loop_var: mount
+  tags: host
+
+# ------ Set Up VFIO ------
+
+- name: Add VFIO kernel command line
+  shell:
+    cmd: grubby --update-kernel=ALL --args="{{ argument }}"
+  with_items:
+    - "modprobe.blacklist=nouveau,nvidia"
+    - "vfio_pci.ids=10de:2486,10de:228b"
+    - "amd_iommu=on"
+  loop_control:
+    loop_var: argument
+  tags: host
+
+- name: Create isolated virtual network
+  community.libvirt.virt_net:
+    command: define
+    name: isolnet
+    xml: |
+      <network>
+        <name>isolnet</name>
+        <uuid>ba222c1d-c035-44f0-a2fc-fde1eae9abb7</uuid>
+        <bridge name="virbr0" stp="on" delay="0"/>
+        <mac address="52:54:00:38:a4:eb"/>
+        <domain name="isolnet"/>
+        <ip address="172.31.0.1" netmask="255.255.0.0">
+          <dhcp>
+            <range start="172.31.128.0" end="172.31.255.254"/>
+          </dhcp>
+        </ip>
+      </network>
+  tags: host
+
+- name: Build isolated virtual network
+  community.libvirt.virt_net:
+    command: create
+    name: isolnet
+  tags: host
+
+- name: Start isolated virtual network
+  community.libvirt.virt_net:
+    name: isolnet
+    state: active
+  tags: host
+
+- name: Auto-start isolated virtual network
+  community.libvirt.virt_net:
+    name: isolnet
+    autostart: true
+  tags: host
+
+- name: Ensure hooks directory exists
+  file:
+    dest: "/etc/libvirt/hooks"
+    state: directory
+    owner: root
+    group: root
+  tags: host
+
+- name: Ensure hooks/qemu is present
+  copy:
+    content: |
+      #!/bin/bash
+      GUEST="${1}"
+      STAGE="${2}"
+      HOST_CORES="0-7"
+      GUEST_CORES="8-15"
+      ALL_CORES="0-15"
+
+      case "${GUEST}" in
+        luna | luna2)
+          case "${STAGE}" in
+            prepare)
+              systemctl set-property --runtime -- user.slice AllowedCPUs=${HOST_CORES}
+              systemctl set-property --runtime -- system.slice AllowedCPUs=${HOST_CORES}
+              systemctl set-property --runtime -- init.scope AllowedCPUs=${HOST_CORES}
+            ;;
+            release)
+              systemctl set-property --runtime -- user.slice AllowedCPUs=${ALL_CORES}
+              systemctl set-property --runtime -- system.slice AllowedCPUs=${ALL_CORES}
+              systemctl set-property --runtime -- init.scope AllowedCPUs=${ALL_CORES}
+            ;;
+            *)
+          esac
+        ;;
+        *)
+      esac
+    dest: "/etc/libvirt/hooks/qemu"
+    owner: root
+    group: root
+    mode: '755'
+  tags: host
+
+- name: Set options in /etc/libvirt/qemu.conf
+  lineinfile:
+    dest: "/etc/libvirt/qemu.conf"
+    regexp: "^{{ option.name }} = "
+    insertafter: "^#{{ option.name }} = "
+    line: "{{ option.name }} = \"{{ option.value }}\""
+  with_items:
+    - name: user
+      value: "{{ config.username }}"
+    - name: group
+      value: "{{ config.username }}"
+  loop_control:
+    loop_var: option
+  tags: host
+
+- name: Set cgroup_device_acl in /etc/libvirt/qemu.conf
+  blockinfile:
+    path: "/etc/libvirt/qemu.conf"
+    block: |
+      cgroup_device_acl = [
+          "/dev/null", "/dev/full", "/dev/zero",
+          "/dev/random", "/dev/urandom",
+          "/dev/ptmx", "/dev/kvm",
+          "/dev/input/by-id/ckb-Corsair_Gaming_M65_Pro_RGB_Mouse_vKB_-event",
+          "/dev/input/by-id/ckb-Corsair_Gaming_M65_Pro_RGB_Mouse_vM_-event",
+          "/dev/input/by-id/usb-MosArt_USB_2.4G_Keyboard-event-kbd"
+      ]
+  tags: host
+
+- name: Define Windows 10 guest
+  community.libvirt.virt:
+    command: define
+    xml: |
+      <domain type='kvm' id='1' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+        <name>luna</name>
+        <uuid>909268af-5e3b-4b15-9806-70a11b6627a5</uuid>
+        <metadata>
+          <libosinfo:libosinfo xmlns:libosinfo="http://libosinfo.org/xmlns/libvirt/domain/1.0">
+            <libosinfo:os id="http://microsoft.com/win/10"/>
+          </libosinfo:libosinfo>
+        </metadata>
+        <memory unit='KiB'>12288000</memory>
+        <currentMemory unit='KiB'>12288000</currentMemory>
+        <vcpu placement='static'>8</vcpu>
+        <cputune>
+          <vcpupin vcpu='0' cpuset='8'/>
+          <vcpupin vcpu='1' cpuset='9'/>
+          <vcpupin vcpu='2' cpuset='10'/>
+          <vcpupin vcpu='3' cpuset='11'/>
+          <vcpupin vcpu='4' cpuset='12'/>
+          <vcpupin vcpu='5' cpuset='13'/>
+          <vcpupin vcpu='6' cpuset='14'/>
+          <vcpupin vcpu='7' cpuset='15'/>
+        </cputune>
+        <resource>
+          <partition>/machine</partition>
+        </resource>
+        <os>
+          <type arch='x86_64' machine='pc-q35-5.2'>hvm</type>
+          <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
+          <nvram>/var/lib/libvirt/qemu/nvram/luna_VARS.fd</nvram>
+        </os>
+        <features>
+          <acpi/>
+          <apic/>
+          <hyperv>
+            <relaxed state='on'/>
+            <vapic state='on'/>
+            <spinlocks state='on' retries='8191'/>
+            <vendor_id state='on' value='randomid'/>
+          </hyperv>
+          <kvm>
+            <hidden state='on'/>
+          </kvm>
+          <vmport state='off'/>
+        </features>
+        <cpu mode='host-passthrough' check='none' migratable='on'>
+          <topology sockets='1' dies='1' cores='4' threads='2'/>
+          <feature policy='require' name='topoext'/>
+        </cpu>
+        <clock offset='localtime'>
+          <timer name='rtc' tickpolicy='catchup'/>
+          <timer name='pit' tickpolicy='delay'/>
+          <timer name='hpet' present='no'/>
+          <timer name='hypervclock' present='yes'/>
+        </clock>
+        <on_poweroff>destroy</on_poweroff>
+        <on_reboot>restart</on_reboot>
+        <on_crash>destroy</on_crash>
+        <pm>
+          <suspend-to-mem enabled='no'/>
+          <suspend-to-disk enabled='no'/>
+        </pm>
+        <devices>
+          <emulator>/usr/bin/qemu-system-x86_64</emulator>
+          <disk type='block' device='disk'>
+            <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+            <source dev='/dev/mapper/kingston' index='2'/>
+            <backingStore/>
+            <target dev='sdb' bus='scsi'/>
+            <boot order='1'/>
+            <alias name='scsi0-0-0-1'/>
+            <address type='drive' controller='0' bus='0' target='0' unit='1'/>
+          </disk>
+          <disk type='block' device='disk'>
+            <driver name='qemu' type='raw' cache='none' io='native'/>
+            <source dev='/dev/seagate/win10-hdd' index='1'/>
+            <backingStore/>
+            <target dev='sdc' bus='scsi'/>
+            <alias name='scsi0-0-0-2'/>
+            <address type='drive' controller='0' bus='0' target='0' unit='2'/>
+          </disk>
+          <controller type='usb' index='0' model='qemu-xhci' ports='15'>
+            <alias name='usb'/>
+            <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
+          </controller>
+          <controller type='scsi' index='0' model='virtio-scsi'>
+            <alias name='scsi0'/>
+            <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
+          </controller>
+          <controller type='pci' index='0' model='pcie-root'>
+            <alias name='pcie.0'/>
+          </controller>
+          <controller type='pci' index='1' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='1' port='0x8'/>
+            <alias name='pci.1'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x0' multifunction='on'/>
+          </controller>
+          <controller type='pci' index='2' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='2' port='0x9'/>
+            <alias name='pci.2'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x1'/>
+          </controller>
+          <controller type='pci' index='3' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='3' port='0xa'/>
+            <alias name='pci.3'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x2'/>
+          </controller>
+          <controller type='pci' index='4' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='4' port='0xb'/>
+            <alias name='pci.4'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x3'/>
+          </controller>
+          <controller type='pci' index='5' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='5' port='0xc'/>
+            <alias name='pci.5'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x4'/>
+          </controller>
+          <controller type='pci' index='6' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='6' port='0xd'/>
+            <alias name='pci.6'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x5'/>
+          </controller>
+          <controller type='pci' index='7' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='7' port='0xe'/>
+            <alias name='pci.7'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x6'/>
+          </controller>
+          <controller type='pci' index='8' model='pcie-root-port'>
+            <model name='pcie-root-port'/>
+            <target chassis='8' port='0xf'/>
+            <alias name='pci.8'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x01' function='0x7'/>
+          </controller>
+          <controller type='sata' index='0'>
+            <alias name='ide'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x1f' function='0x2'/>
+          </controller>
+          <interface type='direct'>
+            <mac address='52:54:00:e1:78:7c'/>
+            <source dev='enp6s0' mode='bridge'/>
+            <target dev='macvtap0'/>
+            <model type='virtio'/>
+            <alias name='net0'/>
+            <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+          </interface>
+          <interface type='network'>
+            <mac address='52:54:00:a3:e1:84'/>
+            <source network='isolnet' portid='4be6bd2f-313c-4554-9d49-223d154d0e24' bridge='virbr1'/>
+            <target dev='vnet0'/>
+            <model type='virtio'/>
+            <alias name='net1'/>
+            <address type='pci' domain='0x0000' bus='0x08' slot='0x00' function='0x0'/>
+          </interface>
+          <input type='mouse' bus='virtio'>
+            <alias name='input0'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x0e' function='0x0'/>
+          </input>
+          <input type='keyboard' bus='virtio'>
+            <alias name='input1'/>
+            <address type='pci' domain='0x0000' bus='0x00' slot='0x0f' function='0x0'/>
+          </input>
+          <input type='mouse' bus='ps2'>
+            <alias name='input2'/>
+          </input>
+          <input type='keyboard' bus='ps2'>
+            <alias name='input3'/>
+          </input>
+          <hostdev mode='subsystem' type='pci' managed='yes'>
+            <driver name='vfio'/>
+            <source>
+              <address domain='0x0000' bus='0x09' slot='0x00' function='0x0'/>
+            </source>
+            <alias name='hostdev0'/>
+            <address type='pci' domain='0x0000' bus='0x04' slot='0x00' function='0x0'/>
+          </hostdev>
+          <hostdev mode='subsystem' type='pci' managed='yes'>
+            <driver name='vfio'/>
+            <source>
+              <address domain='0x0000' bus='0x09' slot='0x00' function='0x1'/>
+            </source>
+            <alias name='hostdev1'/>
+            <address type='pci' domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+          </hostdev>
+          <memballoon model='none'/>
+          <shmem name='scream-ivshmem'>
+            <model type='ivshmem-plain'/>
+            <size unit='M'>2</size>
+            <alias name='shmem0'/>
+            <address type='pci' domain='0x0000' bus='0x07' slot='0x00' function='0x0'/>
+          </shmem>
+        </devices>
+        <seclabel type='dynamic' model='selinux' relabel='yes'>
+          <label>system_u:system_r:svirt_t:s0:c518,c1023</label>
+          <imagelabel>system_u:object_r:svirt_image_t:s0:c518,c1023</imagelabel>
+        </seclabel>
+        <seclabel type='dynamic' model='dac' relabel='yes'>
+          <label>+1000:+1000</label>
+          <imagelabel>+1000:+1000</imagelabel>
+        </seclabel>
+        <qemu:commandline>
+          <qemu:arg value='-object'/>
+          <qemu:arg value='input-linux,id=mouse1,evdev=/dev/input/by-id/ckb-Corsair_Gaming_M65_Pro_RGB_Mouse_vKB_-event'/>
+          <qemu:arg value='-object'/>
+          <qemu:arg value='input-linux,id=mouse2,evdev=/dev/input/by-id/ckb-Corsair_Gaming_M65_Pro_RGB_Mouse_vM_-event'/>
+          <qemu:arg value='-object'/>
+          <qemu:arg value='input-linux,id=kbd2,evdev=/dev/input/by-id/usb-MosArt_USB_2.4G_Keyboard-event-kbd,grab_all=on,repeat=on,grab-toggle=scrolllock'/>
+        </qemu:commandline>
+      </domain>
+  tags: host
+
+- name: Ensure that vfio-pci is added to dracut
+  copy:
+    content: |
+      force_drivers+="vfio vfio-pci vfio_iommu_type1"
+    dest: "/etc/dracut.conf.d/vfio.conf"
+    owner: root
+    group: root
+    mode: '644'
+  tags: host
+
+- name: Regenerate dracut initramfs
+  shell:
+    cmd: "dracut --force"
+  tags: host
