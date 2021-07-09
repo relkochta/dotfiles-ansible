@@ -393,7 +393,7 @@
 - name: Ensure that vfio-pci is added to dracut
   copy:
     content: |
-      force_drivers+="vfio vfio-pci vfio_iommu_type1"
+      force_drivers+=" vfio vfio-pci vfio_iommu_type1 "
     dest: "/etc/dracut.conf.d/vfio.conf"
     owner: root
     group: root
