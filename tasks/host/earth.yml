@@ -183,8 +183,8 @@
             <libosinfo:os id="http://microsoft.com/win/10"/>
           </libosinfo:libosinfo>
         </metadata>
-        <memory unit='KiB'>12288000</memory>
-        <currentMemory unit='KiB'>12288000</currentMemory>
+        <memory unit='KiB'>18874368</memory>
+        <currentMemory unit='KiB'>18874368</currentMemory>
         <vcpu placement='static'>8</vcpu>
         <cputune>
           <vcpupin vcpu='0' cpuset='8'/>
