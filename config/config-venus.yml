@@ -144,6 +144,8 @@ etc_environment:
     value: 24
   - name: LIBVA_DRIVER_NAME
     value: iHD
+  - name: QT_QPA_PLATFORM
+    value: xcb
 
 # Systemd services
 systemd_services:
