@@ -9,10 +9,6 @@ yum_repositories:
     description: Brave Browser Stable
     baseurl: "https://brave-browser-rpm-release.s3.brave.com/x86_64/"
     gpgkey: "https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
-  - name: vscodium
-    description: VSCodium
-    baseurl: "https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/"
-    gpgkey: "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg"
 
 # Repositories to be added by dnf directly (as an rpm)
 dnf_repositories:
@@ -39,17 +35,26 @@ dnf_packages_installed:
   - cronie
   - dbus-x11
   - python3-dnf-plugin-versionlock
-  - intel-media-driver
-  # Fonts
+  - cairo-devel
+  - gtk3-devel
+  - clang
+
+  # - Fonts -
   - google-roboto-fonts
   - google-roboto-mono-fonts
-  # WhiteSur Deps
+
+  # - WhiteSur Deps -
   - sassc
   - glib2-devel
   - libxml2
   - libxml2-devel
   - optipng
   - inkscape
+
+  # - Neovim Dependencies -
+  - clang-tools-extra
+  - nodejs
+  - yarnpkg
 
   # - Ncspot Dependencies -
   - dbus-devel
@@ -64,14 +69,24 @@ dnf_packages_installed:
   # - Command Line Tools -
   - htop
   - tmux
-  - vim
+  - neovim
   - zsh
   - stow
-  - tlp
-  - tlp-rdw
+
+  # - LaTeX -
+  - texlive-scheme-medium
 
   # - Development Tools -
   - make
+
+  # - Drivers -
+  - ckb-next
+
+  # - Virtualization -
+  - libvirt
+  - qemu
+  - edk2-ovmf
+  - virt-manager
 
   # - Graphical Applications -
   - stellarium
@@ -82,12 +97,20 @@ dnf_packages_installed:
   - virt-manager
   - remmina
   - gnome-tweaks
-  - codium
   - anki
   - signal-desktop
   - gnome-extensions-app
   - vorta
   - polari
+  - godot
+  - alacritty
+  - neovim-qt
+  - VirtualBox
+
+  # - Machine Specific -
+  - intel-media-driver
+  - tlp
+  - tlp-rdw
 
   # - GNOME Shell Extensions -
   # (some will be installed from git)
@@ -124,6 +147,10 @@ etc_environment:
 
 # Systemd services
 systemd_services:
+  - name: ckb-next-daemon.service
+    state: started
+    enabled: true
+    masked: false
   - name: tlp.service
     state: started
     enabled: true
@@ -193,7 +220,6 @@ gnome_extensions_enabled:
   - user-theme@gnome-shell-extensions.gcampax.github.com
   - workspace-indicator@gnome-shell-extensions.gcampax.github.com
   - gsconnect@andyholmes.github.io
-  - dash-to-dock@micxgx.gmail.com
   - appindicatorsupport@rgcjonas.gmail.com
   - argos@pew.worldwidemann.com
   - freon@UshakovVasilii_Github.yahoo.com
@@ -223,7 +249,7 @@ gnome_favorites:
   - libreoffice-impress.desktop
   - org.gnome.Calculator.desktop
   - anki.desktop
-  - codium.desktop
+  - nvim-qt.desktop
   - org.gnome.gedit.desktop
   - org.stellarium.Stellarium.desktop
 
@@ -320,3 +346,4 @@ dconf_settings:
   # So that I can actually see lol
   - key: "/org/gnome/desktop/interface/text-scaling-factor"
     value: "1.15"
+
