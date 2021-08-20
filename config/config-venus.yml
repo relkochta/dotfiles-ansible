@@ -104,7 +104,6 @@ dnf_packages_installed:
   - polari
   - godot
   - alacritty
-  - neovim-qt
   - VirtualBox
 
   # - Machine Specific -
@@ -251,7 +250,7 @@ gnome_favorites:
   - libreoffice-impress.desktop
   - org.gnome.Calculator.desktop
   - anki.desktop
-  - nvim-qt.desktop
+  - nvim.desktop
   - org.gnome.gedit.desktop
   - org.stellarium.Stellarium.desktop
 
