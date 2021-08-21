@@ -75,6 +75,9 @@ dnf_packages_installed:
 
   # - LaTeX -
   - texlive-scheme-medium
+  - zathura
+  - zathura-zsh-completion
+  - zathura-pdf-mupdf
 
   # - Development Tools -
   - make
@@ -347,4 +350,7 @@ dconf_settings:
   # So that I can actually see lol
   - key: "/org/gnome/desktop/interface/text-scaling-factor"
     value: "1.15"
+  # Compose Key (Caps Lock)
+  - key: "/org/gnome/desktop/input-sources/xkb-options"
+    value: "['compose:caps']"
 
