@@ -55,6 +55,8 @@ dnf_packages_installed:
   - clang-tools-extra
   - nodejs
   - yarnpkg
+  - xdotool
+  - python3-neovim
 
   # - Ncspot Dependencies -
   - dbus-devel
