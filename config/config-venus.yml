@@ -9,6 +9,10 @@ yum_repositories:
     description: Brave Browser Stable
     baseurl: "https://brave-browser-rpm-release.s3.brave.com/x86_64/"
     gpgkey: "https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
+  - name: vscodium
+    description: VSCodium
+    baseurl: "https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/"
+    gpgkey: "https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg"
 
 # Repositories to be added by dnf directly (as an rpm)
 dnf_repositories:
@@ -76,7 +80,7 @@ dnf_packages_installed:
   - stow
 
   # - LaTeX -
-  - texlive-scheme-medium
+  - texlive-scheme-full
   - zathura
   - zathura-zsh-completion
   - zathura-pdf-mupdf
@@ -108,8 +112,8 @@ dnf_packages_installed:
   - vorta
   - polari
   - godot
-  - alacritty
   - VirtualBox
+  - codium
 
   # - Machine Specific -
   - intel-media-driver
@@ -148,8 +152,6 @@ etc_environment:
     value: 24
   - name: LIBVA_DRIVER_NAME
     value: iHD
-  - name: QT_QPA_PLATFORM
-    value: xcb
 
 # Systemd services
 systemd_services:
@@ -243,21 +245,11 @@ gnome_favorites:
   - org.gnome.Calendar.desktop
   - firefox.desktop
   - com.github.xournalpp.xournalpp.desktop
-  - virt-manager.desktop
   - org.remmina.Remmina.desktop
-  - gnome-system-monitor.desktop
-  - gnome-control-center.desktop
-  - org.gnome.tweaks.desktop
-  - org.gnome.Extensions.desktop
-  - org.gnome.Software.desktop
   - libreoffice-writer.desktop
   - libreoffice-calc.desktop
-  - libreoffice-impress.desktop
-  - org.gnome.Calculator.desktop
+  - nvim-qt.desktop
   - anki.desktop
-  - nvim.desktop
-  - org.gnome.gedit.desktop
-  - org.stellarium.Stellarium.desktop
 
 dconf_settings:
   # Theme
@@ -355,4 +347,6 @@ dconf_settings:
   # Compose Key (Caps Lock)
   - key: "/org/gnome/desktop/input-sources/xkb-options"
     value: "['compose:caps']"
+  - key: "/org/gnome/shell/extensions/caffeine/show-notifications"
+    value: "false"
 
